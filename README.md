@@ -39,6 +39,7 @@ df.head()
 
 <div>
 <style>
+
     .dataframe thead tr:only-child th {
         text-align: right;
     }
@@ -200,6 +201,7 @@ df.head()
 
 <div>
 <style>
+  
     .dataframe thead tr:only-child th {
         text-align: right;
     }
