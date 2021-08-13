@@ -1,28 +1,31 @@
-
 # Medical Appointments in Brazil
 
 ## Table of Contents
-<ul>
+
+<ol>
 <li><a href="#intro">Introduction</a></li>
 <li><a href="#wrangling">Data Wrangling</a></li>
 <li><a href="#eda">Exploratory Data Analysis</a></li>
 <li><a href="#conclusions">Conclusions</a></li>
-</ul>
+</ol>
 
 <a id='intro'></a>
+
 ## Introduction
 
 In this project we investigate a dataset of Brazilian medical appointments sourced from Kaggle. The independent variable is whether the patient missed the appointment, and the dependent variables involve whether an SMS was sent, the age of patients, and the presence of chronic conditions like diabetes.
 
-**Question 1: **
+**Question 1**
+
 Are patients who have been sent an SMS less likely to miss an appointment?
 
-**Question 2: **
+**Question 2**
+
 What is the patient age distribution and how is that associated with missing appointments?
 
-**Question 3: **
-Describe the presence of chronic conditions in the patient population and whether that is associated with missing appointments?
+**Question 3**
 
+Describe the presence of chronic conditions in the patient population and whether that is associated with missing appointments?
 
 ```python
 # import libraries such as pandas and matplotlib
@@ -33,9 +36,6 @@ import pandas as pd
 df = pd.read_csv('appointments.csv')
 df.head()
 ```
-
-
-
 
 <div>
 <style>
@@ -50,6 +50,7 @@ df.head()
     .dataframe tbody tr th {
         vertical-align: top;
     }
+
 </style>
 <table border="1" class="dataframe">
   <thead>
@@ -161,32 +162,33 @@ df.head()
 </table>
 </div>
 
-
-
 <a id='wrangling'></a>
-## Data Wrangling
 
+## Data Wrangling
 
 ### Renaming
 
-**Problem One: ** The name for the appointment column ends with 'ID', but for the patient column it ends with 'Id'. 
+**Problem One**
 
-**Problem Two: ** There are spelling errors for columns, such as 'Hipertension' or 'Handcap'. 
+The name for the appointment column ends with 'ID', but for the patient column it ends with 'Id'.
 
-**Problem Three: ** Some column names could be rephrased to have clearer meaning: 'scholarship' should be renamed to 'bolsa' because it is really referring to whether the patient is sponsored under the Bolsa Familia program, we could rename 'SMS_received' to 'SMS', and 'No-show' to 'Missed'.
+**Problem Two**
 
+There are spelling errors for columns, such as 'Hipertension' or 'Handcap'.
+
+**Problem Three**
+
+Some column names could be rephrased to have clearer meaning: 'scholarship' should be renamed to 'bolsa' because it is really referring to whether the patient is sponsored under the Bolsa Familia program, we could rename 'SMS_received' to 'SMS', and 'No-show' to 'Missed'.
 
 ```python
 # fix problem one by renaming patient
 df = df.rename(columns = {'PatientId': 'PatientID'})
 ```
 
-
 ```python
 # fix problem two by correcting spelling errors
 df = df.rename(columns = {'Hipertension': 'Hypertension', 'Handcap': 'Handicap'})
 ```
-
 
 ```python
 # fix problem three by simplifying some names
@@ -195,9 +197,6 @@ df = df.rename(columns = {'Scholarship': 'Bolsa', 'SMS_received': 'SMS', 'No-sho
 # check that corrections have taken effect
 df.head()
 ```
-
-
-
 
 <div>
 <style>
@@ -212,6 +211,7 @@ df.head()
     .dataframe tbody tr th {
         vertical-align: top;
     }
+
 </style>
 <table border="1" class="dataframe">
   <thead>
@@ -323,27 +323,19 @@ df.head()
 </table>
 </div>
 
-
-
 ### Duplicates
-Let us check to see if there are any duplicate rows, and if so remove them.
 
+Let us check to see if there are any duplicate rows, and if so remove them.
 
 ```python
 sum(df.duplicated())
 ```
 
-
-
-
     0
-
-
 
 ### Datatypes
 
 Now that we know there are no duplicate rows, let us probe deeper to see if there are any incorrect data types or missing values
-
 
 ```python
 df.info()
@@ -369,9 +361,7 @@ df.info()
     dtypes: float64(1), int64(8), object(5)
     memory usage: 11.8+ MB
 
-
-Every column has the same number of values as there are rows so there is no problem with missing values. However the 'ScheduledDay' and 'AppointmentDay' columns appear to be strings when they could more appropriately be datetimes. Furthermore, other columns representing whether the patient is a part of Bolsa Familia, and whether they have certain medical conditions are represented as integers when booleans would be better. 
-
+Every column has the same number of values as there are rows so there is no problem with missing values. However the 'ScheduledDay' and 'AppointmentDay' columns appear to be strings when they could more appropriately be datetimes. Furthermore, other columns representing whether the patient is a part of Bolsa Familia, and whether they have certain medical conditions are represented as integers when booleans would be better.
 
 ```python
 # change string datatypes to datetimes
@@ -408,33 +398,24 @@ df.info()
     dtypes: bool(6), datetime64[ns](2), float64(1), int64(2), object(3)
     memory usage: 7.4+ MB
 
-
 <a id='eda'></a>
+
 ## Exploratory Data Analysis
 
 Now that we have assessed and cleaned our data, it is time for exploration. We will be investigating along the questions that were formulated earlier.
 
 ### Does sending SMS make patients less likely to miss appointments?
 
-
 ```python
 %matplotlib inline
 df['SMS'].value_counts().plot(kind='pie', autopct='%1.1f%%', title='Proportion of patients receiving SMS', figsize=[5,5])
 ```
 
-
-
-
     <matplotlib.axes._subplots.AxesSubplot at 0x105f465f8>
-
-
-
 
 ![png](output_15_1.png)
 
-
-We know that only 32% of patients received SMS reminders, the question is whether the receipt of such a reminder made patients less likely to attend appointments. 
-
+We know that only 32% of patients received SMS reminders, the question is whether the receipt of such a reminder made patients less likely to attend appointments.
 
 ```python
 # split data frame into two groups
@@ -445,38 +426,22 @@ df_NSMS = df.query('SMS == False')
 df_SMS['Missed'].value_counts().plot(kind='pie', title='Appointments missed with SMS', autopct='%1.1f%%', figsize=[5,5])
 ```
 
-
-
-
     <matplotlib.axes._subplots.AxesSubplot at 0x107ef6588>
 
-
-
-
 ![png](output_17_1.png)
-
-
 
 ```python
 # what proportion of appointments were missed by those who did not receive an SMS?
 df_NSMS['Missed'].value_counts().plot(kind='pie', title='Appointments missed without SMS', autopct='%1.1f%%', figsize=[5,5])
 ```
 
-
-
-
     <matplotlib.axes._subplots.AxesSubplot at 0x108919a90>
 
-
-
-
 ![png](output_18_1.png)
-
 
 ### Are older patients more likely to miss appointments?
 
 Let us first get an idea of the age distribution in our patient population.
-
 
 ```python
 plt.xlabel('Age')
@@ -484,9 +449,6 @@ plt.ylabel('Number')
 plt.title('Age Distribution in Patient Population')
 plt.hist(df['Age'])
 ```
-
-
-
 
     (array([  1.87500000e+04,   1.59270000e+04,   1.54230000e+04,
               1.74860000e+04,   1.70720000e+04,   1.57400000e+04,
@@ -496,14 +458,9 @@ plt.hist(df['Age'])
               91.8,  103.4,  115. ]),
      <a list of 10 Patch objects>)
 
-
-
-
 ![png](output_20_1.png)
 
-
 So the vast majority of patients are 60 or under. Let's divide our patient population into three groups: young (under 30), middle aged (between 30 and less than 60) and old (60 and over). Then we will see if there are differences in the rate at which these groups miss appointments.
-
 
 ```python
 young = df.query('Age < 30')
@@ -513,53 +470,29 @@ old = df.query('Age >= 60')
 young['Missed'].value_counts().plot(kind='pie', autopct='%1.1f%%', figsize=[5,5], title='Missed Appointments by Young Patients')
 ```
 
-
-
-
     <matplotlib.axes._subplots.AxesSubplot at 0x10a65e208>
 
-
-
-
 ![png](output_22_1.png)
-
-
 
 ```python
 middle['Missed'].value_counts().plot(kind='pie', autopct='%1.1f%%', figsize=[5,5], title='Missed Appointments by Middle-Aged Patients')
 ```
 
-
-
-
     <matplotlib.axes._subplots.AxesSubplot at 0x1144e5f28>
 
-
-
-
 ![png](output_23_1.png)
-
-
 
 ```python
 old['Missed'].value_counts().plot(kind='pie', autopct='%1.1f%%', figsize=[5,5], title='Missed Appointments by Elderly Patients')
 ```
 
-
-
-
     <matplotlib.axes._subplots.AxesSubplot at 0x114c20978>
 
-
-
-
 ![png](output_24_1.png)
-
 
 ### Are patients with chronic conditions more likely to miss appointments?
 
 Let us first calculate the number of patients with chronic conditions (one or more of diabetes, alcoholism, hypertension, or handicap) in the population, and what is the proportion?
-
 
 ```python
 # split dataset into two groups: patients with chronic conditions, and those without
@@ -570,53 +503,34 @@ healthy = df.query('Hypertension == False & Diabetes == False & Alcoholism == Fa
 chronic['PatientID'].count()/df['PatientID'].count()
 ```
 
-
-
-
     0.23896423498330724
 
-
-
 Now that we know almost 24% of the patient population suffer a chronic condition, we ask ourselves whether such patients are more or less likely to miss an appointment.
-
 
 ```python
 healthy['Missed'].value_counts().plot(kind='pie', title='Appointments missed by healthy patients', autopct='%1.1f%%', figsize=[5,5])
 ```
 
-
-
-
     <matplotlib.axes._subplots.AxesSubplot at 0x114cee3c8>
 
-
-
-
 ![png](output_28_1.png)
-
-
 
 ```python
 chronic['Missed'].value_counts().plot(kind='pie', title='Appointments missed by patients with at least one chronic condition', autopct='%1.1f%%', figsize=[5,5])
 ```
 
-
-
-
     <matplotlib.axes._subplots.AxesSubplot at 0x114ceea20>
-
-
-
 
 ![png](output_29_1.png)
 
-
 <a id='conclusions'></a>
+
 ## Conclusions
 
 Our exploration has generated the statistics and graphs allowing us to fulfill the purposes of our investigation. We can see how certain social and medical factors affect the likelihood of patients missing their appointments. Some findings were expected, others were surprising and carry practical implications.
 
 ### Did SMS reminders lower missed appointments?
+
 Only around 32% of patients received an SMS reminder, and to our surprise those who did receive it were more likely to miss an appointment (27.6%) than those who didn’t (16.7%). Perhaps we should consider no longer sending SMS reminders.
 
 ### How does age impact on keeping appointments?
@@ -631,12 +545,11 @@ Around 24% of the patient population suffered a chronic condition (diabetes, alc
 
 **Hidden Variables**
 
-Though we have found important correlations in our data, this does not mean that one variable causes another. There may be a hidden variable that we don't know about influencing the relationship. For example, we found receiving an SMS actually increased the number of missed appointments, but it could be that SMS reminders were being sent to people most likely to miss appointments in the first place. These considerations hold true for other variables, age itself may not decrease likelihood of missing appointment, it may be that older people live closer to clinics. 
-
+Though we have found important correlations in our data, this does not mean that one variable causes another. There may be a hidden variable that we don't know about influencing the relationship. For example, we found receiving an SMS actually increased the number of missed appointments, but it could be that SMS reminders were being sent to people most likely to miss appointments in the first place. These considerations hold true for other variables, age itself may not decrease likelihood of missing appointment, it may be that older people live closer to clinics.
 
 **Other investigative paths**
 
-Consider the gap between appointment times, does  a larger gap increase missed appointments?
+Consider the gap between appointment times, does a larger gap increase missed appointments?
 
 Consider gender. What is the gender distribution in the patient population and does being of a certain gender increase the chances of missing an appointment?
 
